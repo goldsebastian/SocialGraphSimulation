@@ -63,7 +63,7 @@ def step(p1New, p1Old, p2New, p2Old, idl, con, m1, m2, e1, e2):
    	  	 p1New[uid] = True
    	  	 p2New[uid] = (m2*cum2/float(fcount) > uthresh*e2)
    	  elif p1Old[uid] and p2Old[uid]:
-   	  	 update = [(m1*cum1/float(fcount) > uthresh*e1), (m2*cum2/float(fcount) > uthresh)*e2]
+   	  	 update = [(m1*cum1/float(fcount) > uthresh*e1), (m2*cum2/float(fcount) > uthresh*e2)]
    	  	 if not update[0] and not update[1]:
    	  	 	update[random.sample(xrange(2), 1)[0]] = True # don't drop both
    	  	 	
@@ -86,7 +86,6 @@ def uniformRandomThresh(idl):
    print s/float(N)
 
 # main operating code
-# takes index_space_limit, steps, merit1, merit2, concentration1, concentration2
 socialGraph, length, users, N = readGraph(sys.argv[1], int(sys.argv[2]))
 merit1 = float(sys.argv[4])
 merit2 = float(sys.argv[5])
