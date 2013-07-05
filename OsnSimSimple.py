@@ -4,6 +4,26 @@ from bitarray import bitarray
 import random
 import sys
 
+#read the binary.  Takes binary file name.
+def readGraphBin(gFile):
+    """ file format is as follows
+    first is the size in ASCII followed by newline
+    next is the sequence of degrees in binary, 4 bytes per item 
+    next is the sequence of edges for each node, 
+    there are no record separators -- sizes are determined by degrees """
+    with open(gFile) as fin:
+        size = int(fin.readline())
+         
+        def loadArray(sz):
+            arr = array.array('I')
+            arr.fromfile(fin, sz)
+            return arr
+
+        degree_seq = loadArray(size)
+        return [loadArray(degree) for degree in degree_seq]
+
+
+
 # Takes the name of the file to be read.
 # Returns an array, length of array (ID space size), and list of Ids
 def readGraph(gFile, limit):
@@ -120,19 +140,36 @@ def seedRand(idl, con, pa, pb, c, n):
       pa[node[0]] = True
       pb[node[0]] = True
 
+# set seeding.  Takes bitarrays, user list, and desired id range to seed
+def seedRange(idl, pa, pb, rl, rh):
+    for node in idl:
+        if node[0] > rl and node[0] < rh:
+            pa[node[0]] = True
+            pb[node[0]] = True
+
 # function to set thresholds uniformly at random
 def uniformRandomThresh(idl):
-   s = 0
    for user in idl:
       user[1] = random.random()
-      s += user[1]
-   print s/float(N)
+
+# function to set thresholds all at same value
+def uniformThresh(idl, thresh):
+    for user in idl:
+        user[1] = thresh
 
 # main operating code
 def main():
-   socialGraph, length, users, N = readGraph(sys.argv[1], int(sys.argv[2]))
-   merit1 = float(sys.argv[4])
-   merit2 = float(sys.argv[5])
+   #socialGraph, length, users, N = readGraph(sys.argv[1], int(sys.argv[2]))
+   socialGraph = readGraphBin("fbgraph.bin")
+   length = len(socialGraph)
+   N = length-1
+   users = []
+   for i in range(length):
+   	  if len(socialGraph[i]) > 0:
+   	  	 users.append([i, 0])
+   	  	 
+   merit1 = float(1)
+   merit2 = float(2)
    entry1 = 1
    entry2 = 1
    # set the bitarrays
@@ -145,13 +182,13 @@ def main():
    p2b = bitarray(length)
    p2b.setall(False)
    # set up other parts
-   uniformRandomThresh(users)   
-   seedRand(users, socialGraph, p1a, p1b, float(sys.argv[6]), N)
-   seedRand(users, socialGraph, p2a, p2b, float(sys.argv[7]), N)
+   uniformThresh(users, 0.3)   
+   seedRange(users, p1a, p1b, 1, 100000)
+   seedRange(users, p2a, p2b, 100000, 200000)
    # print initial values
    print p1a.count(True)/float(N), p2a.count(True)/float(N)
    print p1a.count(True), p2a.count(True)
-   for i in range(0, int(sys.argv[3])/2):
+   for i in range(0, int(sys.argv[1])/2):
    	  step(p1a, p1b, p2a, p2b, users, socialGraph, merit1, merit2, entry1, entry2)
    	  print p1a.count(True)/float(N), p2a.count(True)/float(N)
    	  #and again
