@@ -7,7 +7,6 @@ import convertBIN as cb
 def readGraph(gFile, limit):
     graph = open(gFile, 'r')
     social = []
-    meta = []
     size = 0
     print limit
     for line in graph:
@@ -26,16 +25,11 @@ def readGraph(gFile, limit):
             social.append(array.array('i', []))
           
         social.append(friendList)
-        if len(idi) > 2:
-            meta.append(array.array('i', [idi[0], 0]))
-        """if (size % 10000) == 0:
-            print social[n][:6]
-            print size"""
         if (size % 100) == 0:
             sys.stderr.write("\r current size: %d" % size)
         size += 1
         
-    return social, size
+    return social
 
 # takes the name of the file containing metadata, as well as the number of net idSpace, and returns networks
 def readNets(mFile):
@@ -58,26 +52,35 @@ def readNets(mFile):
                 
     return nets
 
+def testBin(arw):
+    with open('lt.bin', 'w') as fiw:
+        arw.tofile(fiw)
+    
+    arr = array.array(arw.typecode)
+    with open('lt.bin', 'r') as fir:
+        arr.fromfile(fir, len(arw))
+    
+    return arr
+
 #main function
 def main():
     #networksOrig = readNets("mhrw-nodeproperties.txt")
     #print networksOrig
     
     limit = 957359    
-    socialGraphOrig, idSpace = readGraph("mhrw-socialgraph.txt", limit)
+    socialGraphOrig = readGraph("mhrw-socialgraph.txt", limit)
     idMap = cb.getMap(socialGraphOrig)
     socialGraph = cb.reIndexSocial(socialGraphOrig, idMap)
     metaList = cb.genMeta(len(socialGraph))
     networksOrig = readNets("mhrw-nodeproperties.txt")
     networks = cb.reIndexNets(networksOrig, idMap)
-    subdir = "./facebook-mhrw-binary/"
+    subdir = "./fbmh-binary/"
     prefix = subdir + "fbmh-"
     cb.assureDir(subdir)
-    cb.writeGraphBin(prefix + "socialgraphOriginal.bin", socialGraph)
     cb.writeGraphBin(prefix + "socialgraph.bin", socialGraph)
     cb.writeMetaBin(prefix + "metalist.bin", metaList)
     cb.writeIdMapBin(prefix + "idmap.bin", idMap)
-    cb.writeNetworksBin(prefix + "networks.bin", networks)
+    cb.writeNetworksBin(prefix + "networksTop.bin", networks)
 
 
 if __name__ == "__main__":

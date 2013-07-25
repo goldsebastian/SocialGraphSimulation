@@ -19,18 +19,19 @@ def readGraph(gFile, sizemil):
        
         while (idi[0] >= size) or (idi[1] >= size):
             size += 1
-            social.append(array.array('i', []))
+            social.append(array.array('i'))
           
         social[idi[0]].append(idi[1])
         social[idi[1]].append(idi[0])
+        #print social[idi[0]], social[idi[1]], idi[0], idi[1]
                 
         if (idi[0] % 100) == 0:
             #print size, idi[0], "array good?", social[idi[0]][:6]
-            sys.stderr.write("\r current size: %d  current id: %d" % (size, idi[0]))    # or print >> sys.stdout, "\r%d%%" %i,
+            sys.stderr.write("\r current size: %d  current id: %d  current length: %d" % (size, idi[0], len(social)))    # or print >> sys.stdout, "\r%d%%" %i,
             #sys.stderr.flush()
-           
-    #meta.sort()
-    return social, size 
+    #print len(social)
+    #print social
+    return social
 
 # reads networks and stores them in a ragged array.  Assumed network ID's are the line in the array in which they occur.
 def readNets(nFile):
@@ -47,7 +48,7 @@ def readNets(nFile):
 # Converts the desired dataset.  Takes unique ident(ifier), which is used for subdir and prefix, and approximate size in millions
 def convertSnap(ident, size):
     print "converting data for", ident
-    socialGraphOrig, idSpace = readGraph("com-" + ident + ".ungraph.txt", size)
+    socialGraphOrig = readGraph("com-" + ident + ".ungraph.txt", size)
     idMap = cb.getMap(socialGraphOrig)
     socialGraph = cb.reIndexSocial(socialGraphOrig, idMap)
     metaList = cb.genMeta(len(socialGraph))

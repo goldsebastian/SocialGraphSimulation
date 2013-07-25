@@ -3,7 +3,6 @@ import sys
 import random
 import os
 
-
 # generate mapping array to re-index at 0 with no missing id's
 def getMap(socialOld):
     idMap = array.array('i')
@@ -22,7 +21,7 @@ def writeIdMapBin(wfile, idMap):
     """file format is as follows:
     first is the length of the idMap array, followed by newline
     next is the idMap array, all integers, 4 bytes per item"""
-    with open(wfile, 'w') as fil:
+    with open(wfile, 'wb') as fil:
         length = len(idMap)        
         fil.write(str(length) + "\n")
         idMap.tofile(fil)
@@ -55,7 +54,7 @@ def readGraphBin(gFile):
     next is the sequence of degrees in binary, 4 bytes per item 
     next is the sequence of edges for each node, 
     there are no record separators -- sizes are determined by degrees """
-    with open(gFile) as fin:
+    with open(gFile, 'rb') as fin:
         size = int(fin.readline())
          
         def loadArray(sz):
@@ -73,12 +72,12 @@ def writeGraphBin(wFile, graph):
     next is the sequence of degrees in binary, 4 bytes per item
     next is the sequence of edges for each node.
     there are no record separators -- sizes are determines by degrees """
-    with open(wFile, 'w') as fil:
-        size = len(graph)
+    with open(wFile, 'wb') as fil:
         degree_seq = array.array('i')
         for degree in graph:
             degree_seq.append(len(degree))
         
+        size = len(degree_seq)
         fil.write(str(size) + "\n")
         degree_seq.tofile(fil)
         for line in graph:
@@ -99,7 +98,7 @@ def writeMetaBin(wfile, meta):
     first is the length of the metadata array, followed by newline
     next is the width of the metadata array, followed by newline
     next is the metadata array, all integers, 8 bytes per item"""
-    with open(wfile, 'w') as fil:
+    with open(wfile, 'wb') as fil:
         length = len(meta)
         width = len(meta[0])
         
@@ -114,7 +113,7 @@ def readMetaBin(rfile):
     first is the length of the metadata array, followed by newline
     next is the width of the metadata array, followed by newline
     next is the metadata array, all integers, 8 bytes per item"""
-    with open(rfile, 'r') as fin:
+    with open(rfile, 'rb') as fin:
         length = int(fin.readline())
         width = int(fin.readline())
         
@@ -132,7 +131,7 @@ def writeNetworksBin(wfile, graph):
     next is the sequence of degrees in binary, 4 bytes per item
     next is the sequence of edges for each node.
     there are no record separators -- sizes are determines by degrees """
-    with open(wfile, 'w') as fil:
+    with open(wfile, 'wb') as fil:
         size = len(graph)
         degree_seq = array.array('i')
         for degree in graph:
@@ -150,7 +149,7 @@ def readNetsBin(gFile):
     next is the sequence of degrees in binary, 4 bytes per item 
     next is the sequence of edges for each node, 
     there are no record separators -- sizes are determined by degrees """
-    with open(gFile) as fin:
+    with open(gFile, 'rb') as fin:
         size = int(fin.readline())
          
         def loadArray(sz):
